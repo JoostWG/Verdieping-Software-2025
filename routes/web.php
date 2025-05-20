@@ -3,9 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::permanentRedirect('/', route('dashboard'));
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
