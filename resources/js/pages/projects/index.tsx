@@ -110,15 +110,15 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                 <Table.Header>
                     <Table.Row>
                         <Table.ColumnHeaderCell>Naam</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Aangemaakt op</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Aangemaakt</Table.ColumnHeaderCell>
                     </Table.Row>
                 </Table.Header>
 
                 <Table.Body>
                     {projects.map((project) => (
-                        <Table.Row>
+                        <Table.Row key={project.id}>
                             <Table.Cell>{project.name}</Table.Cell>
-                            <Table.Cell>{dayjs(project.created_at).format('LLLL')}</Table.Cell>
+                            <Table.Cell title={dayjs(project.created_at).format('LLLL')}>{dayjs(project.created_at).fromNow()}</Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

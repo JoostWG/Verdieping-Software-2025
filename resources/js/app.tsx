@@ -9,9 +9,11 @@ import { initializeTheme } from './hooks/use-appearance';
 import dayjs from 'dayjs';
 import nl from 'dayjs/locale/nl';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.locale(nl);
 dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime);
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
