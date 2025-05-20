@@ -8,8 +8,10 @@ import { initializeTheme } from './hooks/use-appearance';
 
 import dayjs from 'dayjs';
 import nl from 'dayjs/locale/nl';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 dayjs.locale(nl);
+dayjs.extend(localizedFormat);
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
