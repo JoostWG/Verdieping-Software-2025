@@ -1,3 +1,4 @@
+import '@radix-ui/themes/styles.css';
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';

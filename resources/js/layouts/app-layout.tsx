@@ -1,5 +1,6 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Theme } from '@radix-ui/themes';
 import { type ReactNode } from 'react';
 
 interface AppLayoutProps {
@@ -9,6 +10,6 @@ interface AppLayoutProps {
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-        {children}
+        <Theme>{children}</Theme>
     </AppLayoutTemplate>
 );
