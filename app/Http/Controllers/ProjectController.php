@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -32,7 +33,19 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => ['required', 'max:255', Rule::unique('projects', 'name')->where('user_id', Auth::id())],
+        ], [
+            'unique' => 'Je hebt al een project met die naam.',
+        ]);
+
+        $project = Auth::user()
+            ->projects()
+            ->create($data);
+
+        $project->refresh();
+
+        return $project;
     }
 
     /**
