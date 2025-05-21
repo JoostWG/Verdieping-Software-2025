@@ -2,7 +2,7 @@
 
 Dit is het product voor mijn keuzedeel Verdieping Software.
 
-# Instalatie
+# Installatie
 
 <!-- TODO: Add instalation instructions -->
 
