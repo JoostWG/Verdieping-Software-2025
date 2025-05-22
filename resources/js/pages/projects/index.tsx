@@ -19,6 +19,38 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+export default function ProjectIndex(props: { projects: Project[] }) {
+    const [projects, setProjects] = useState<Project[]>([...props.projects]);
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Projects" />
+
+            <CreateProjectDialog onProjectCreate={(project) => setProjects([...projects, project])} />
+
+            <Table.Root>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.ColumnHeaderCell>Naam</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Aangemaakt</Table.ColumnHeaderCell>
+                    </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                    {projects.map((project) => (
+                        <Table.Row key={project.id}>
+                            <Table.Cell>
+                                <Link href={route('projects.show', [project])}>{project.name}</Link>
+                            </Table.Cell>
+                            <Table.Cell title={dayjs(project.created_at).format('LLLL')}>{dayjs(project.created_at).fromNow()}</Table.Cell>
+                        </Table.Row>
+                    ))}
+                </Table.Body>
+            </Table.Root>
+        </AppLayout>
+    );
+}
+
 function CreateProjectDialog(props: { onProjectCreate: (project: Project) => void }) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
@@ -92,37 +124,5 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
                 </form>
             </DialogContent>
         </Dialog>
-    );
-}
-
-export default function ProjectIndex(props: { projects: Project[] }) {
-    const [projects, setProjects] = useState<Project[]>([...props.projects]);
-
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Projects" />
-
-            <CreateProjectDialog onProjectCreate={(project) => setProjects([...projects, project])} />
-
-            <Table.Root>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.ColumnHeaderCell>Naam</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Aangemaakt</Table.ColumnHeaderCell>
-                    </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                    {projects.map((project) => (
-                        <Table.Row key={project.id}>
-                            <Table.Cell>
-                                <Link href={route('projects.show', [project])}>{project.name}</Link>
-                            </Table.Cell>
-                            <Table.Cell title={dayjs(project.created_at).format('LLLL')}>{dayjs(project.created_at).fromNow()}</Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table.Root>
-        </AppLayout>
     );
 }
