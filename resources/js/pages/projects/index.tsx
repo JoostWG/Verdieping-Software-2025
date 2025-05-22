@@ -1,6 +1,14 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
@@ -26,7 +34,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Projects" />
 
-            <CreateProjectDialog onProjectCreate={(project) => setProjects([...projects, project])} />
+            <CreateProjectDialog
+                onProjectCreate={(project) => setProjects([...projects, project])}
+            />
 
             <Table.Root>
                 <Table.Header>
@@ -42,7 +52,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                             <Table.Cell>
                                 <Link href={route('projects.show', [project])}>{project.name}</Link>
                             </Table.Cell>
-                            <Table.Cell title={dayjs(project.created_at).format('LLLL')}>{dayjs(project.created_at).fromNow()}</Table.Cell>
+                            <Table.Cell title={dayjs(project.created_at).format('LLLL')}>
+                                {dayjs(project.created_at).fromNow()}
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>
@@ -79,7 +91,11 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
             .catch((error) => {
                 setProcessing(false);
 
-                if (error instanceof AxiosError && error.status === 422 && error.response?.data?.message) {
+                if (
+                    error instanceof AxiosError &&
+                    error.status === 422 &&
+                    error.response?.data?.message
+                ) {
                     setError(error.response.data.message);
                     return;
                 }
@@ -100,14 +116,22 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
 
             <DialogContent>
                 <DialogTitle>Maak een nieuw project aan</DialogTitle>
-                <DialogDescription>Maak een nieuw project aan. Kies een naam die uniek is.</DialogDescription>
+                <DialogDescription>
+                    Maak een nieuw project aan. Kies een naam die uniek is.
+                </DialogDescription>
                 <form className="space-y-6" onSubmit={submit}>
                     <div className="grid gap-2">
                         <Label htmlFor="name" className="sr-only">
                             Naam
                         </Label>
 
-                        <Input id="name" name="name" value={name} readOnly={processing} onChange={(e) => setName(e.target.value)} />
+                        <Input
+                            id="name"
+                            name="name"
+                            value={name}
+                            readOnly={processing}
+                            onChange={(e) => setName(e.target.value)}
+                        />
 
                         <InputError message={error} />
                     </div>
