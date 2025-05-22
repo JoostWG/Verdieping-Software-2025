@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ProjectIndex(props: { projects: Project[] }) {
-    const [projects, setProjects] = useState<Project[]>([...props.projects]);
+    const [projects, setProjects] = useState([...props.projects]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
