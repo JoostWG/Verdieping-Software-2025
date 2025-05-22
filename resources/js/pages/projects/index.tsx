@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Project } from '@/types/models';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
@@ -115,7 +115,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                 <Table.Body>
                     {projects.map((project) => (
                         <Table.Row key={project.id}>
-                            <Table.Cell>{project.name}</Table.Cell>
+                            <Table.Cell>
+                                <Link href={route('projects.show', [project])}>{project.name}</Link>
+                            </Table.Cell>
                             <Table.Cell title={dayjs(project.created_at).format('LLLL')}>{dayjs(project.created_at).fromNow()}</Table.Cell>
                         </Table.Row>
                     ))}

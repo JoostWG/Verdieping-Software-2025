@@ -16,6 +16,11 @@ class Project extends Model
         'name',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'name'; // TODO: Get this to work. Perhaps a slug like I did in my F1 app would be good
+    }
+
     /**
      * The user that owns this project
      *
