@@ -10,7 +10,7 @@ import { Head } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,15 +25,13 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
     const [error, setError] = useState('');
     const [processing, setProcessing] = useState(false);
 
-    function setDialogOpen(open: boolean) {
-        setOpen(open);
-
+    useEffect(() => {
         if (open) {
             setName('');
             setError('');
             setProcessing(false);
         }
-    }
+    }, [open]);
 
     function submit(event: FormEvent) {
         event.preventDefault();
@@ -44,7 +42,7 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
             .post<Project>(route('projects.store'), { name })
             .then(({ data }) => {
                 props.onProjectCreate(data);
-                setDialogOpen(false);
+                setOpen(false);
             })
             .catch((error) => {
                 setProcessing(false);
@@ -61,7 +59,7 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
     }
 
     return (
-        <Dialog open={open} onOpenChange={setDialogOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="default" className="m-2">
                     Nieuw project
