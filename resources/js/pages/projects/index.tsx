@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Project } from '@/types/models';
@@ -19,7 +20,7 @@ import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { TriangleAlert } from 'lucide-react';
-import { FormEvent, JSX, useEffect, useReducer, useState } from 'react';
+import { FormEvent, JSX, useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,33 +30,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ProjectIndex(props: { projects: Project[] }) {
-    const [projects, dispatchProjectsReducer] = useReducer(
-        (
-            state,
-            action:
-                | { type: 'add'; project: Project }
-                | { type: 'update'; projectId: Project['id']; fields: Partial<Project> }
-                | { type: 'delete'; projectId: Project['id'] },
-        ) => {
-            switch (action.type) {
-                case 'add':
-                    return [action.project, ...state];
-
-                case 'update':
-                    return state.map((project) =>
-                        project.id === action.projectId
-                            ? { ...project, ...action.fields }
-                            : project,
-                    );
-
-                case 'delete':
-                    return state.filter((project) => project.id !== action.projectId);
-
-                default:
-                    return state;
-            }
-        },
+    const [projects, [addProject, updateProject, removeProject]] = useArrayState(
         props.projects,
+        (project) => project.id,
     );
 
     return (
@@ -69,7 +46,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                     </Button>
                 }
                 onChange={(project) => {
-                    dispatchProjectsReducer({ type: 'add', project });
+                    addProject(project);
                 }}
             />
 
@@ -101,11 +78,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                         }
                                         project={project}
                                         onChange={(projectData) => {
-                                            dispatchProjectsReducer({
-                                                type: 'update',
-                                                projectId: project.id,
-                                                fields: projectData,
-                                            });
+                                            updateProject(project, projectData);
                                         }}
                                     />
                                     <ProjectDeleteConfirmationDialog
@@ -115,12 +88,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                             </Button>
                                         }
                                         project={project}
-                                        onDelete={() =>
-                                            dispatchProjectsReducer({
-                                                type: 'delete',
-                                                projectId: project.id,
-                                            })
-                                        }
+                                        onDelete={() => {
+                                            removeProject(project);
+                                        }}
                                     />
                                 </div>
                             </Table.Cell>
