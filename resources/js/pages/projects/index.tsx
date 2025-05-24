@@ -216,7 +216,7 @@ function ProjectDialog(props: {
                         </DialogClose>
 
                         <Button variant="default" asChild disabled={isProcessing}>
-                            <button type="submit">Aanmaken</button>
+                            <button type="submit">Opslaan</button>
                         </Button>
                     </DialogFooter>
                 </form>
