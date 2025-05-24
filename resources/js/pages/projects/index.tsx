@@ -33,6 +33,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
     const [projects, [addProject, updateProject, removeProject]] = useArrayState(
         props.projects,
         (project) => project.id,
+        {
+            addToBeginningOfArray: true,
+        },
     );
 
     return (

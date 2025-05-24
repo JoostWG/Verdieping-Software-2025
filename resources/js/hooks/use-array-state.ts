@@ -3,6 +3,9 @@ import { useState } from 'react';
 export function useArrayState<T extends object>(
     items: T[],
     key: (item: T) => string | number,
+    options?: {
+        addToBeginningOfArray: boolean;
+    },
 ): [
     state: T[],
     modifiers: [
@@ -18,7 +21,7 @@ export function useArrayState<T extends object>(
         state,
         [
             (item: T) => {
-                setState([...state, item]);
+                setState(options?.addToBeginningOfArray ? [item, ...state] : [...state, item]);
             },
             (item: T, fields: Partial<T>) => {
                 setState(
