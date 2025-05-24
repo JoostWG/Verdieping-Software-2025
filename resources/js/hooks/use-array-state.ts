@@ -23,7 +23,7 @@ export function useArrayState<T extends object>(
             (item: T, fields: Partial<T>) => {
                 setState(
                     state.map((otherItem) =>
-                        key(item) === key(otherItem) ? { ...item, ...fields } : item,
+                        key(item) === key(otherItem) ? { ...otherItem, ...fields } : otherItem,
                     ),
                 );
             },
