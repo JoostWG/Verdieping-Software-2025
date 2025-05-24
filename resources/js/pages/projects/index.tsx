@@ -39,7 +39,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
         ) => {
             switch (action.type) {
                 case 'add':
-                    return [...state, action.project];
+                    return [action.project, ...state];
 
                 case 'update':
                     return state.map((project) =>

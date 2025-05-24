@@ -20,7 +20,10 @@ class ProjectController extends Controller
         Gate::authorize('viewAny', [Project::class]);
 
         return Inertia::render('projects/index', [
-            'projects' => Auth::user()->projects,
+            'projects' => Auth::user()
+                ->projects()
+                ->orderByDesc('created_at')
+                ->get(),
         ]);
     }
 
