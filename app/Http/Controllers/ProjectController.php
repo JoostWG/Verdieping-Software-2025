@@ -76,7 +76,23 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        //
+        Gate::authorize('update', [$project]);
+
+        $data = $request->validate([
+            'name' => [
+                'required',
+                'max:255',
+                Rule::unique('projects', 'name')
+                    ->where('user_id', Auth::id())
+                    ->whereNot('id', $project->id),
+            ],
+        ], [
+            'unique' => 'Je hebt al een project met die naam.',
+        ]);
+
+        $project->update($data);
+
+        return $project;
     }
 
     /**

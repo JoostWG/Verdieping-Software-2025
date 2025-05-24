@@ -18,7 +18,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, JSX, useEffect, useReducer, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,14 +28,42 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ProjectIndex(props: { projects: Project[] }) {
-    const [projects, setProjects] = useState([...props.projects]);
+    const [projects, dispatchProjectsReducer] = useReducer(
+        (
+            state,
+            action:
+                | { type: 'add'; project: Project }
+                | { type: 'update'; projectId: Project['id']; fields: Partial<Project> },
+        ) => {
+            switch (action.type) {
+                case 'add':
+                    return [...state, action.project];
+
+                case 'update':
+                    return state.map((project) =>
+                        project.id === action.projectId
+                            ? { ...project, ...action.fields }
+                            : project,
+                    );
+
+                default:
+                    return state;
+            }
+        },
+        props.projects,
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Projects" />
 
-            <CreateProjectDialog
-                onProjectCreate={(project) => setProjects([...projects, project])}
+            <ProjectDialog
+                trigger={
+                    <Button variant="default" className="m-2">
+                        Nieuw project
+                    </Button>
+                }
+                onChange={(project) => dispatchProjectsReducer({ type: 'add', project })}
             />
 
             <Table.Root>
@@ -43,6 +71,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                     <Table.Row>
                         <Table.ColumnHeaderCell>Naam</Table.ColumnHeaderCell>
                         <Table.ColumnHeaderCell>Aangemaakt</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
                     </Table.Row>
                 </Table.Header>
 
@@ -55,6 +84,23 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                             <Table.Cell title={dayjs(project.created_at).format('LLLL')}>
                                 {dayjs(project.created_at).fromNow()}
                             </Table.Cell>
+                            <Table.Cell>
+                                <ProjectDialog
+                                    trigger={
+                                        <Button variant="secondary" className="m-2">
+                                            Wijzigen
+                                        </Button>
+                                    }
+                                    project={project}
+                                    onChange={(project) =>
+                                        dispatchProjectsReducer({
+                                            type: 'update',
+                                            projectId: project.id,
+                                            fields: project,
+                                        })
+                                    }
+                                />
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>
@@ -63,33 +109,40 @@ export default function ProjectIndex(props: { projects: Project[] }) {
     );
 }
 
-function CreateProjectDialog(props: { onProjectCreate: (project: Project) => void }) {
+function ProjectDialog(props: {
+    trigger: JSX.Element;
+    project?: Project;
+    onChange: (project: Project) => void;
+}) {
+    const initialProjectName = props.project ? props.project.name : '';
     const [open, setOpen] = useState(false);
-    const [name, setName] = useState('');
+    const [projectName, setProjectName] = useState(initialProjectName);
     const [error, setError] = useState('');
-    const [processing, setProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         if (open) {
-            setName('');
+            setProjectName(initialProjectName);
             setError('');
-            setProcessing(false);
+            setIsProcessing(false);
         }
-    }, [open]);
+    }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
     function submit(event: FormEvent) {
         event.preventDefault();
 
-        setProcessing(true);
+        setIsProcessing(true);
 
-        axios
-            .post<Project>(route('projects.store'), { name })
+        (props.project
+            ? axios.put<Project>(route('projects.update', [props.project]), { name: projectName })
+            : axios.post<Project>(route('projects.store'), { name: projectName })
+        )
             .then(({ data }) => {
-                props.onProjectCreate(data);
+                props.onChange(data);
                 setOpen(false);
             })
             .catch((error) => {
-                setProcessing(false);
+                setIsProcessing(false);
 
                 if (
                     error instanceof AxiosError &&
@@ -108,29 +161,25 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="default" className="m-2">
-                    Nieuw project
-                </Button>
-            </DialogTrigger>
+            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
 
             <DialogContent>
-                <DialogTitle>Maak een nieuw project aan</DialogTitle>
-                <DialogDescription>
-                    Maak een nieuw project aan. Kies een naam die uniek is.
-                </DialogDescription>
+                <DialogTitle>
+                    {props.project
+                        ? `Wijzig project ${props.project.name}`
+                        : 'Maak een nieuw project aan'}
+                </DialogTitle>
+                <DialogDescription>Kies een naam die uniek is</DialogDescription>
                 <form className="space-y-6" onSubmit={submit}>
                     <div className="grid gap-2">
-                        <Label htmlFor="name" className="sr-only">
-                            Naam
-                        </Label>
+                        <Label htmlFor="name">Naam</Label>
 
                         <Input
                             id="name"
                             name="name"
-                            value={name}
-                            readOnly={processing}
-                            onChange={(e) => setName(e.target.value)}
+                            value={projectName}
+                            readOnly={isProcessing}
+                            onChange={(e) => setProjectName(e.target.value)}
                         />
 
                         <InputError message={error} />
@@ -141,7 +190,7 @@ function CreateProjectDialog(props: { onProjectCreate: (project: Project) => voi
                             <Button variant="secondary">Annuleren</Button>
                         </DialogClose>
 
-                        <Button variant="default" asChild disabled={processing}>
+                        <Button variant="default" asChild disabled={isProcessing}>
                             <button type="submit">Aanmaken</button>
                         </Button>
                     </DialogFooter>
