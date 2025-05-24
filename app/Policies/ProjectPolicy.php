@@ -38,4 +38,12 @@ class ProjectPolicy
     {
         return $this->view($user, $project);
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Project $project): bool
+    {
+        return $this->view($user, $project);
+    }
 }

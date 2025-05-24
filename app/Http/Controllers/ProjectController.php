@@ -6,6 +6,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -100,6 +101,10 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        Gate::authorize('delete', [$project]);
+
+        $project->delete();
+
+        return Response::noContent();
     }
 }

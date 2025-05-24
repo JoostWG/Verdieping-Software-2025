@@ -18,6 +18,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
+import { TriangleAlert } from 'lucide-react';
 import { FormEvent, JSX, useEffect, useReducer, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -33,7 +34,8 @@ export default function ProjectIndex(props: { projects: Project[] }) {
             state,
             action:
                 | { type: 'add'; project: Project }
-                | { type: 'update'; projectId: Project['id']; fields: Partial<Project> },
+                | { type: 'update'; projectId: Project['id']; fields: Partial<Project> }
+                | { type: 'delete'; projectId: Project['id'] },
         ) => {
             switch (action.type) {
                 case 'add':
@@ -45,6 +47,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                             ? { ...project, ...action.fields }
                             : project,
                     );
+
+                case 'delete':
+                    return state.filter((project) => project.id !== action.projectId);
 
                 default:
                     return state;
@@ -85,21 +90,37 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                 {dayjs(project.created_at).fromNow()}
                             </Table.Cell>
                             <Table.Cell>
-                                <ProjectDialog
-                                    trigger={
-                                        <Button variant="secondary" className="m-2">
-                                            Wijzigen
-                                        </Button>
-                                    }
-                                    project={project}
-                                    onChange={(project) =>
-                                        dispatchProjectsReducer({
-                                            type: 'update',
-                                            projectId: project.id,
-                                            fields: project,
-                                        })
-                                    }
-                                />
+                                <div className="flex gap-2">
+                                    <ProjectDialog
+                                        trigger={
+                                            <Button variant="secondary" className="m-2">
+                                                Wijzigen
+                                            </Button>
+                                        }
+                                        project={project}
+                                        onChange={(project) =>
+                                            dispatchProjectsReducer({
+                                                type: 'update',
+                                                projectId: project.id,
+                                                fields: project,
+                                            })
+                                        }
+                                    />
+                                    <ProjectDeleteConfirmationDialog
+                                        trigger={
+                                            <Button variant="destructive" className="m-2">
+                                                Verwijderen
+                                            </Button>
+                                        }
+                                        project={project}
+                                        onDelete={() =>
+                                            dispatchProjectsReducer({
+                                                type: 'delete',
+                                                projectId: project.id,
+                                            })
+                                        }
+                                    />
+                                </div>
                             </Table.Cell>
                         </Table.Row>
                     ))}
@@ -195,6 +216,54 @@ function ProjectDialog(props: {
                         </Button>
                     </DialogFooter>
                 </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ProjectDeleteConfirmationDialog(props: {
+    trigger: JSX.Element;
+    project: Project;
+    onDelete: () => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    function submit() {
+        setIsProcessing(true);
+
+        axios
+            .delete(route('projects.destroy', [props.project]))
+            .then(() => {
+                props.onDelete();
+                setOpen(false);
+            })
+            .finally(() => {
+                setIsProcessing(false);
+            });
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+
+            <DialogContent>
+                <DialogTitle className="flex items-center gap-1">
+                    <TriangleAlert className="text-yellow-500" />
+                    Verwijder project {props.project.name}
+                </DialogTitle>
+                <DialogDescription>
+                    Weet je zeker dat je dit project wilt verwijderen?
+                </DialogDescription>
+                <DialogFooter className="gap-2">
+                    <DialogClose asChild>
+                        <Button variant="secondary">Annuleren</Button>
+                    </DialogClose>
+
+                    <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
+                        <button type="submit">Verwijderen</button>
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
