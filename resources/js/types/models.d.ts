@@ -14,4 +14,16 @@ export interface Project {
     created_at: string;
     updated_at: string;
     user?: User;
+    tasks?: Task[];
+}
+
+export interface Task {
+    id: number;
+    project_id: number;
+    nr: number;
+    title: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+    project?: Project;
 }
