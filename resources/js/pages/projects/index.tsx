@@ -68,7 +68,9 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                         Nieuw project
                     </Button>
                 }
-                onChange={(project) => dispatchProjectsReducer({ type: 'add', project })}
+                onChange={(project) => {
+                    dispatchProjectsReducer({ type: 'add', project });
+                }}
             />
 
             <Table.Root>
@@ -98,13 +100,13 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                             </Button>
                                         }
                                         project={project}
-                                        onChange={(project) =>
+                                        onChange={(projectData) => {
                                             dispatchProjectsReducer({
                                                 type: 'update',
                                                 projectId: project.id,
-                                                fields: project,
-                                            })
-                                        }
+                                                fields: projectData,
+                                            });
+                                        }}
                                     />
                                     <ProjectDeleteConfirmationDialog
                                         trigger={
@@ -133,18 +135,18 @@ export default function ProjectIndex(props: { projects: Project[] }) {
 function ProjectDialog(props: {
     trigger: JSX.Element;
     project?: Project;
-    onChange: (project: Project) => void;
+    onChange: (projectData: Project) => void;
 }) {
     const initialProjectName = props.project ? props.project.name : '';
     const [open, setOpen] = useState(false);
     const [projectName, setProjectName] = useState(initialProjectName);
-    const [error, setError] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         if (open) {
             setProjectName(initialProjectName);
-            setError('');
+            setErrorMessage('');
             setIsProcessing(false);
         }
     }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -170,11 +172,11 @@ function ProjectDialog(props: {
                     error.status === 422 &&
                     error.response?.data?.message
                 ) {
-                    setError(error.response.data.message);
+                    setErrorMessage(error.response.data.message);
                     return;
                 }
 
-                if (error) setError('Er is iets fout gegaan.');
+                setErrorMessage('Er is iets fout gegaan.');
 
                 throw error;
             });
@@ -200,10 +202,12 @@ function ProjectDialog(props: {
                             name="name"
                             value={projectName}
                             readOnly={isProcessing}
-                            onChange={(e) => setProjectName(e.target.value)}
+                            onChange={(e) => {
+                                setProjectName(e.target.value);
+                            }}
                         />
 
-                        <InputError message={error} />
+                        <InputError message={errorMessage} />
                     </div>
 
                     <DialogFooter className="gap-2">
