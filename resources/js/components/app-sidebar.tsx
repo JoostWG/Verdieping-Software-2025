@@ -24,6 +24,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Projecten',
         href: route('projects.index'),
+        activePattern: 'projects.*',
         icon: FolderCode,
     },
 ];
