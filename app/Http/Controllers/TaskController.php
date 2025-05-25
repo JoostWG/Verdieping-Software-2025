@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Response;
 
 class TaskController extends Controller
 {
@@ -41,5 +42,17 @@ class TaskController extends Controller
         $task->update($data);
 
         return $task;
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Task $task)
+    {
+        Gate::authorize('delete', [$task]);
+
+        $task->delete();
+
+        return Response::noContent();
     }
 }

@@ -16,8 +16,9 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Project, Task } from '@/types/backend';
 import { Head, useForm } from '@inertiajs/react';
+import { DialogDescription } from '@radix-ui/react-dialog';
 import axios, { AxiosError } from 'axios';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
 import { FormEvent, JSX, useEffect, useState } from 'react';
 
 type TaskForm = Pick<Task, 'project_id' | 'title' | 'description'>;
@@ -34,7 +35,7 @@ export default function ProjectShow(props: { project: Project }) {
         },
     ];
 
-    const [tasks, [addTask, updateTask]] = useArrayState(
+    const [tasks, [addTask, updateTask, removeTask]] = useArrayState(
         props.project.tasks ?? [],
         (task) => task.id,
     );
@@ -62,7 +63,7 @@ export default function ProjectShow(props: { project: Project }) {
                                     </div>
                                 </div>
 
-                                <div className="me-4">
+                                <div className="me-4 flex items-center gap-2">
                                     <TaskDialog
                                         trigger={
                                             <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
@@ -71,6 +72,16 @@ export default function ProjectShow(props: { project: Project }) {
                                         task={task}
                                         onChange={(taskData) => {
                                             updateTask(task, taskData);
+                                        }}
+                                    />
+
+                                    <TaskDeleteConfirmationDialog
+                                        trigger={
+                                            <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                        }
+                                        task={task}
+                                        onDelete={() => {
+                                            removeTask(task);
                                         }}
                                     />
                                 </div>
@@ -204,50 +215,50 @@ function TaskDialog(props: {
     );
 }
 
-// function ProjectDeleteConfirmationDialog(props: {
-//     trigger: JSX.Element;
-//     project: Project;
-//     onDelete: () => void;
-// }) {
-//     const [open, setOpen] = useState(false);
-//     const [isProcessing, setIsProcessing] = useState(false);
+function TaskDeleteConfirmationDialog(props: {
+    trigger: JSX.Element;
+    task: Task;
+    onDelete: () => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
-//     function submit() {
-//         setIsProcessing(true);
+    function submit() {
+        setIsProcessing(true);
 
-//         axios
-//             .delete(route('projects.destroy', [props.project]))
-//             .then(() => {
-//                 props.onDelete();
-//                 setOpen(false);
-//             })
-//             .finally(() => {
-//                 setIsProcessing(false);
-//             });
-//     }
+        axios
+            .delete(route('tasks.destroy', [props.task]))
+            .then(() => {
+                props.onDelete();
+                setOpen(false);
+            })
+            .finally(() => {
+                setIsProcessing(false);
+            });
+    }
 
-//     return (
-//         <Dialog open={open} onOpenChange={setOpen}>
-//             <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
 
-//             <DialogContent>
-//                 <DialogTitle className="flex items-center gap-1">
-//                     <TriangleAlert className="text-yellow-500" />
-//                     Verwijder project {props.project.name}
-//                 </DialogTitle>
-//                 <DialogDescription>
-//                     Weet je zeker dat je dit project wilt verwijderen?
-//                 </DialogDescription>
-//                 <DialogFooter className="gap-2">
-//                     <DialogClose asChild>
-//                         <Button variant="secondary">Annuleren</Button>
-//                     </DialogClose>
+            <DialogContent>
+                <DialogTitle className="flex items-center gap-1">
+                    <TriangleAlert className="text-yellow-500" />
+                    Verwijder taak #{props.task.nr}
+                </DialogTitle>
+                <DialogDescription>
+                    Weet je zeker dat je deze taak wilt verwijderen?
+                </DialogDescription>
+                <DialogFooter className="gap-2">
+                    <DialogClose asChild>
+                        <Button variant="secondary">Annuleren</Button>
+                    </DialogClose>
 
-//                     <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
-//                         <button type="submit">Verwijderen</button>
-//                     </Button>
-//                 </DialogFooter>
-//             </DialogContent>
-//         </Dialog>
-//     );
-// }
+                    <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
+                        <button type="submit">Verwijderen</button>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}

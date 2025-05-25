@@ -23,4 +23,12 @@ class TaskPolicy
     {
         return $user->can('update', $task->project);
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Task $task): bool
+    {
+        return $user->can('update', $task->project);
+    }
 }
