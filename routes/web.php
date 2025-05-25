@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,6 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::apiResource('projects', ProjectController::class);
+
+    Route::apiResource('tasks', TaskController::class)->only(['store']);
 });
 
 require __DIR__ . '/settings.php';
