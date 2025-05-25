@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Project } from '@/types/models';
+import { Project } from '@/types/backend';
 import { Head } from '@inertiajs/react';
 
 export default function ProjectShow(props: { project: Project }) {

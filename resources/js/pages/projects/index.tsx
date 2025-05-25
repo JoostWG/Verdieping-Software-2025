@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Project } from '@/types/models';
+import { Project } from '@/types/backend';
 import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
