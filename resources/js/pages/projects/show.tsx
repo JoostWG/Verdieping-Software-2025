@@ -13,13 +13,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
-import { Project, Task } from '@/types/backend';
+import type { BreadcrumbItem } from '@/types';
+import type { Project, Task } from '@/types/backend';
 import { Head, useForm } from '@inertiajs/react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import axios, { AxiosError } from 'axios';
 import { Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
-import { FormEvent, JSX, useEffect, useState } from 'react';
+import type { FormEvent, JSX } from 'react';
+import { useEffect, useState } from 'react';
 
 type TaskForm = Pick<Task, 'project_id' | 'title' | 'description'>;
 

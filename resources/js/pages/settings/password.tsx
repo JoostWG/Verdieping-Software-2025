@@ -4,7 +4,8 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import type { FormEventHandler } from 'react';
+import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';

@@ -13,14 +13,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
-import { Project } from '@/types/backend';
+import type { BreadcrumbItem } from '@/types';
+import type { Project } from '@/types/backend';
 import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { Pencil, Trash2, TriangleAlert } from 'lucide-react';
-import { FormEvent, JSX, useEffect, useState } from 'react';
+import type { FormEvent, JSX } from 'react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
