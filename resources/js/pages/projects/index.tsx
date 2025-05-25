@@ -19,7 +19,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { TriangleAlert } from 'lucide-react';
+import { Pencil, Trash2, TriangleAlert } from 'lucide-react';
 import { FormEvent, JSX, useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -75,9 +75,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                 <div className="flex gap-2">
                                     <ProjectDialog
                                         trigger={
-                                            <Button variant="secondary" className="m-2">
-                                                Wijzigen
-                                            </Button>
+                                            <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
                                         }
                                         project={project}
                                         onChange={(projectData) => {
@@ -86,9 +84,7 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                     />
                                     <ProjectDeleteConfirmationDialog
                                         trigger={
-                                            <Button variant="destructive" className="m-2">
-                                                Verwijderen
-                                            </Button>
+                                            <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
                                         }
                                         project={project}
                                         onDelete={() => {
