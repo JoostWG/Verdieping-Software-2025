@@ -9,7 +9,7 @@ export interface User {
 
 export interface Project {
     id: number;
-    user_id: number;
+    user_id: User['id'];
     name: string;
     created_at: string;
     updated_at: string;
@@ -19,7 +19,7 @@ export interface Project {
 
 export interface Task {
     id: number;
-    project_id: number;
+    project_id: Project['id'];
     nr: number;
     title: string;
     description: string;
