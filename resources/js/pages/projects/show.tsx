@@ -3,7 +3,7 @@ import { BreadcrumbItem } from '@/types';
 import { Project } from '@/types/models';
 import { Head } from '@inertiajs/react';
 
-export default function ProjectIndex(props: { project: Project }) {
+export default function ProjectShow(props: { project: Project }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Projecten',
