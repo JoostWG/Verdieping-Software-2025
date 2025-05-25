@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 
 class TaskPolicy
@@ -13,5 +14,13 @@ class TaskPolicy
     public function viewAny(User $user, Project $project): bool
     {
         return $user->can('view', $project);
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Task $task): bool
+    {
+        return $user->can('update', $task->project);
     }
 }

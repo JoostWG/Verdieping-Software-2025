@@ -17,7 +17,7 @@ import { BreadcrumbItem } from '@/types';
 import { Project, Task } from '@/types/backend';
 import { Head, useForm } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { FormEvent, JSX, useEffect, useState } from 'react';
 
 type TaskForm = Pick<Task, 'project_id' | 'title' | 'description'>;
@@ -34,7 +34,10 @@ export default function ProjectShow(props: { project: Project }) {
         },
     ];
 
-    const [tasks, [addTask]] = useArrayState(props.project.tasks ?? [], (task) => task.id);
+    const [tasks, [addTask, updateTask]] = useArrayState(
+        props.project.tasks ?? [],
+        (task) => task.id,
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -48,12 +51,29 @@ export default function ProjectShow(props: { project: Project }) {
                 ) : (
                     <div className="divide-y rounded-md border">
                         {tasks.map((task) => (
-                            <div key={task.id} className="p-2">
-                                <div className="flex gap-1">
-                                    <div className="text-neutral-400">#{task.nr}</div>
-                                    <div>{task.title}</div>
+                            <div className="flex items-center justify-between gap-1 p-2">
+                                <div key={task.id}>
+                                    <div className="flex gap-1">
+                                        <div className="text-neutral-400">#{task.nr}</div>
+                                        <div>{task.title}</div>
+                                    </div>
+                                    <div className="text-sm text-neutral-500">
+                                        {task.description}
+                                    </div>
                                 </div>
-                                <div className="text-sm text-neutral-500">{task.description}</div>
+
+                                <div className="me-4">
+                                    <TaskDialog
+                                        trigger={
+                                            <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                        }
+                                        project={props.project}
+                                        task={task}
+                                        onChange={(taskData) => {
+                                            updateTask(task, taskData);
+                                        }}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>

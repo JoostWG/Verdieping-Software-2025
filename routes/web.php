@@ -14,7 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::apiResource('projects', ProjectController::class);
 
-    Route::apiResource('tasks', TaskController::class)->only(['store']);
+    Route::apiResource('tasks', TaskController::class)->only(['store', 'update']);
 });
 
 require __DIR__ . '/settings.php';
