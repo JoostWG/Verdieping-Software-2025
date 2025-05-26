@@ -11,11 +11,18 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Project, Task } from '@/types/backend';
+import type { Project, Tag, Task } from '@/types/backend';
 import { Head, useForm } from '@inertiajs/react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import axios, { AxiosError } from 'axios';
@@ -23,7 +30,12 @@ import { Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
 
-type TaskForm = Pick<Task, 'project_id' | 'title' | 'description'>;
+type TaskForm = {
+    project_id?: Task['project_id'];
+    title: Task['title'];
+    description: Task['description'];
+    tag_ids: Tag['id'][];
+};
 
 export default function ProjectShow(props: { project: Project }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -129,7 +141,13 @@ function TaskDialog(props: {
     onChange: (taskData: Task) => void;
 }) {
     const form = useForm<TaskForm>(
-        props.task ?? { title: '', description: '', project_id: props.project.id },
+        props.task
+            ? {
+                  title: props.task.title,
+                  description: props.task.description,
+                  tag_ids: props.task.tags?.map((tag) => tag.id) ?? [],
+              }
+            : { title: '', description: '', project_id: props.project.id, tag_ids: [] },
     );
 
     const [open, setOpen] = useState(false);
@@ -153,6 +171,7 @@ function TaskDialog(props: {
         )
             .then(({ data }) => {
                 props.onChange(data);
+                form.setDefaults();
                 setOpen(false);
             })
             .catch((error) => {
@@ -213,6 +232,56 @@ function TaskDialog(props: {
                         />
 
                         <InputError message={form.errors.description} />
+
+                        {props.project.tags && (
+                            <>
+                                <div className="mt-1 flex flex-wrap gap-1 rounded-md border p-2">
+                                    {form.data.tag_ids
+                                        .map((id) =>
+                                            props.project.tags?.find((tag) => tag.id === id),
+                                        )
+                                        .filter((tag): tag is Tag => Boolean(tag))
+                                        .map((tag) => (
+                                            <TagBadge
+                                                key={tag.id}
+                                                tag={tag}
+                                                onDeleteClick={() => {
+                                                    form.setData(
+                                                        'tag_ids',
+                                                        form.data.tag_ids.filter(
+                                                            (id) => id !== tag.id,
+                                                        ),
+                                                    );
+                                                }}
+                                            />
+                                        ))}
+                                </div>
+
+                                <Select
+                                    value=""
+                                    onValueChange={(value) => {
+                                        form.setData('tag_ids', [
+                                            ...form.data.tag_ids,
+                                            Number(value),
+                                        ]);
+                                    }}
+                                >
+                                    <SelectTrigger className="mt-1">
+                                        <SelectValue placeholder="Voeg een tag toe" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {props.project.tags
+                                            .filter((tag) => !form.data.tag_ids.includes(tag.id))
+                                            .map((tag) => (
+                                                <SelectItem key={tag.id} value={String(tag.id)}>
+                                                    {tag.name}
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                            </>
+                        )}
                     </div>
 
                     <DialogFooter className="gap-2">
