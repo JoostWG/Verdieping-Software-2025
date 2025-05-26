@@ -54,7 +54,10 @@ export default function ProjectShow(props: { project: Project }) {
                 ) : (
                     <div className="divide-y rounded-md border">
                         {tasks.map((task) => (
-                            <div className="flex items-center justify-between gap-1 p-2">
+                            <div
+                                key={task.id}
+                                className="flex items-center justify-between gap-1 p-2"
+                            >
                                 <div key={task.id}>
                                     <div className="flex gap-1">
                                         <div className="text-neutral-400">#{task.nr}</div>
@@ -67,7 +70,9 @@ export default function ProjectShow(props: { project: Project }) {
                                         <div className="flex items-center gap-1">
                                             Tags:{' '}
                                             {task.tags.length
-                                                ? task.tags.map((tag) => <TagBadge tag={tag} />)
+                                                ? task.tags.map((tag) => (
+                                                      <TagBadge key={tag.id} tag={tag} />
+                                                  ))
                                                 : 'No tags assigned'}
                                         </div>
                                     )}
