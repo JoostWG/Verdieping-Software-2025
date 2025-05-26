@@ -56,7 +56,7 @@ class ProjectController extends Controller
     {
         Gate::authorize('view', [$project]);
 
-        $project->load('tasks');
+        $project->load('tasks.tags');
 
         return Inertia::render('projects/show', compact('project'));
     }

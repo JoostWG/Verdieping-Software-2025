@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { TagBadge } from '@/components/tag-badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -62,6 +63,14 @@ export default function ProjectShow(props: { project: Project }) {
                                     <div className="text-sm text-neutral-500">
                                         {task.description}
                                     </div>
+                                    {task.tags && (
+                                        <div className="flex items-center gap-1">
+                                            Tags:{' '}
+                                            {task.tags.length
+                                                ? task.tags.map((tag) => <TagBadge tag={tag} />)
+                                                : 'No tags assigned'}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="me-4 flex items-center gap-2">
