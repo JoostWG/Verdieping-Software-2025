@@ -15,6 +15,7 @@ export interface Project {
     updated_at: string;
     user?: User;
     tasks?: Task[];
+    tags?: Tag[];
 }
 
 export interface Task {
@@ -26,4 +27,14 @@ export interface Task {
     created_at: string;
     updated_at: string;
     project?: Project;
+    tags?: Tag[];
+}
+
+export interface Tag {
+    id: number;
+    project_id: Project['id'];
+    name: string;
+    created_at: string;
+    updated_at: string;
+    tasks?: Task[];
 }
