@@ -233,6 +233,8 @@ function TaskDialog(props: {
 
                         <InputError message={form.errors.description} />
 
+                        <Label className="mt-1">Tags</Label>
+
                         {props.project.tags && (
                             <>
                                 <div className="mt-1 flex flex-wrap gap-1 rounded-md border p-2">
@@ -266,7 +268,7 @@ function TaskDialog(props: {
                                         ]);
                                     }}
                                 >
-                                    <SelectTrigger className="mt-1">
+                                    <SelectTrigger>
                                         <SelectValue placeholder="Voeg een tag toe" />
                                     </SelectTrigger>
 
