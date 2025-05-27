@@ -20,7 +20,10 @@ class ProjectController extends Controller
         Gate::authorize('viewAny', [Project::class]);
 
         return Inertia::render('projects/index', [
-            'projects' => Auth::user()->projects()->orderByDesc('created_at')->get(),
+            'projects' => Auth::user()
+                ->projects()
+                ->orderByDesc('created_at')
+                ->get(),
         ]);
     }
 
@@ -36,7 +39,10 @@ class ProjectController extends Controller
                 'name' => [
                     'required',
                     'max:255',
-                    Rule::unique('projects', 'name')->where('user_id', Auth::id()),
+                    Rule::unique('projects', 'name')->where(
+                        'user_id',
+                        Auth::id()
+                    ),
                 ],
             ],
             [

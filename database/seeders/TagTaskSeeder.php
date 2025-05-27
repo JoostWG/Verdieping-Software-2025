@@ -15,7 +15,9 @@ class TagTaskSeeder extends Seeder
     {
         foreach (Task::with('project.tags')->get() as $task) {
             $tags = $task->project->tags;
-            $task->tags()->sync($tags->random(random_int(1, $tags->count() - 1)));
+            $task
+                ->tags()
+                ->sync($tags->random(random_int(1, $tags->count() - 1)));
         }
     }
 }

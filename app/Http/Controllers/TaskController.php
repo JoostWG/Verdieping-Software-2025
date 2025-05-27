@@ -21,11 +21,17 @@ class TaskController extends Controller
             'description' => ['required', 'max:4294967295'],
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => [
-                Rule::exists('tags', 'id')->where('project_id', $request->input('project_id')),
+                Rule::exists('tags', 'id')->where(
+                    'project_id',
+                    $request->input('project_id')
+                ),
             ],
         ]);
 
-        $project = $request->user()->projects()->findOrFail($data['project_id']);
+        $project = $request
+            ->user()
+            ->projects()
+            ->findOrFail($data['project_id']);
 
         $task = $project->tasks()->create($data);
         $task->tags()->sync($request->input('tag_ids', []));
@@ -46,7 +52,12 @@ class TaskController extends Controller
             'title' => ['required', 'max:255'],
             'description' => ['required', 'max:4294967295'],
             'tag_ids' => ['nullable', 'array'],
-            'tag_ids.*' => [Rule::exists('tags', 'id')->where('project_id', $task->project_id)],
+            'tag_ids.*' => [
+                Rule::exists('tags', 'id')->where(
+                    'project_id',
+                    $task->project_id
+                ),
+            ],
         ]);
 
         $task->update($data);

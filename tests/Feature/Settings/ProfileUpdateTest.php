@@ -28,7 +28,9 @@ class ProfileUpdateTest extends TestCase
             'email' => 'test@example.com',
         ]);
 
-        $response->assertSessionHasNoErrors()->assertRedirect('/settings/profile');
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/settings/profile');
 
         $user->refresh();
 
@@ -46,7 +48,9 @@ class ProfileUpdateTest extends TestCase
             'email' => $user->email,
         ]);
 
-        $response->assertSessionHasNoErrors()->assertRedirect('/settings/profile');
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/settings/profile');
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
@@ -75,7 +79,9 @@ class ProfileUpdateTest extends TestCase
                 'password' => 'wrong-password',
             ]);
 
-        $response->assertSessionHasErrors('password')->assertRedirect('/settings/profile');
+        $response
+            ->assertSessionHasErrors('password')
+            ->assertRedirect('/settings/profile');
 
         $this->assertNotNull($user->fresh());
     }

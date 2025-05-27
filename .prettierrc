@@ -19,6 +19,12 @@
             "options": {
                 "tabWidth": 2
             }
+        },
+        {
+            "files": "**/*.php",
+            "options": {
+                "printWidth": 80
+            }
         }
     ]
 }

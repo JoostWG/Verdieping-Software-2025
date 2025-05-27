@@ -17,7 +17,8 @@ class Task extends Model
     protected static function booted(): void
     {
         static::creating(function (Task $task) {
-            $task->nr = Task::where('project_id', $task->project_id)->max('nr') + 1;
+            $task->nr =
+                Task::where('project_id', $task->project_id)->max('nr') + 1;
         });
     }
 
