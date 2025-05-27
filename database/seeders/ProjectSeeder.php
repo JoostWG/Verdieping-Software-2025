@@ -14,9 +14,7 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         foreach (User::all() as $user) {
-            Project::factory(5)
-                ->for($user)
-                ->create();
+            Project::factory(5)->for($user)->create();
         }
     }
 }

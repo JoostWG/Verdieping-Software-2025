@@ -15,9 +15,7 @@ class TagSeeder extends Seeder
     public function run(): void
     {
         foreach (Project::all() as $project) {
-            Tag::factory(10)
-                ->for($project)
-                ->create();
+            Tag::factory(10)->for($project)->create();
         }
     }
 }

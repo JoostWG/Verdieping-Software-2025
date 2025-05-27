@@ -12,12 +12,7 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'project_id',
-        'nr',
-        'title',
-        'description',
-    ];
+    protected $fillable = ['project_id', 'nr', 'title', 'description'];
 
     protected static function booted(): void
     {

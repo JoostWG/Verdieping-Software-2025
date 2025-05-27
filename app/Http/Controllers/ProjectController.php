@@ -20,10 +20,7 @@ class ProjectController extends Controller
         Gate::authorize('viewAny', [Project::class]);
 
         return Inertia::render('projects/index', [
-            'projects' => Auth::user()
-                ->projects()
-                ->orderByDesc('created_at')
-                ->get(),
+            'projects' => Auth::user()->projects()->orderByDesc('created_at')->get(),
         ]);
     }
 
@@ -34,15 +31,20 @@ class ProjectController extends Controller
     {
         Gate::authorize('create', [Project::class]);
 
-        $data = $request->validate([
-            'name' => ['required', 'max:255', Rule::unique('projects', 'name')->where('user_id', Auth::id())],
-        ], [
-            'unique' => 'Je hebt al een project met die naam.',
-        ]);
+        $data = $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'max:255',
+                    Rule::unique('projects', 'name')->where('user_id', Auth::id()),
+                ],
+            ],
+            [
+                'unique' => 'Je hebt al een project met die naam.',
+            ]
+        );
 
-        $project = Auth::user()
-            ->projects()
-            ->create($data);
+        $project = Auth::user()->projects()->create($data);
 
         $project->refresh();
 
@@ -68,17 +70,20 @@ class ProjectController extends Controller
     {
         Gate::authorize('update', [$project]);
 
-        $data = $request->validate([
-            'name' => [
-                'required',
-                'max:255',
-                Rule::unique('projects', 'name')
-                    ->where('user_id', Auth::id())
-                    ->whereNot('id', $project->id),
+        $data = $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'max:255',
+                    Rule::unique('projects', 'name')
+                        ->where('user_id', Auth::id())
+                        ->whereNot('id', $project->id),
+                ],
             ],
-        ], [
-            'unique' => 'Je hebt al een project met die naam.',
-        ]);
+            [
+                'unique' => 'Je hebt al een project met die naam.',
+            ]
+        );
 
         $project->update($data);
 

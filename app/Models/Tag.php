@@ -12,10 +12,7 @@ class Tag extends Model
     /** @use HasFactory<\Database\Factories\TagFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'project_id',
-        'name',
-    ];
+    protected $fillable = ['project_id', 'name'];
 
     /**
      * The project this task belongs to

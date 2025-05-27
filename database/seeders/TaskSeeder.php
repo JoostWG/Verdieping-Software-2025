@@ -14,9 +14,7 @@ class TaskSeeder extends Seeder
     public function run(): void
     {
         foreach (Project::all() as $project) {
-            Task::factory(5)
-                ->for($project)
-                ->create();
+            Task::factory(5)->for($project)->create();
         }
     }
 }

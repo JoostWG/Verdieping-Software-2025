@@ -12,10 +12,7 @@ class Project extends Model
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'name',
-    ];
+    protected $fillable = ['user_id', 'name'];
 
     /**
      * The user that owns this project

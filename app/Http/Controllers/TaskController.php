@@ -46,9 +46,7 @@ class TaskController extends Controller
             'title' => ['required', 'max:255'],
             'description' => ['required', 'max:4294967295'],
             'tag_ids' => ['nullable', 'array'],
-            'tag_ids.*' => [
-                Rule::exists('tags', 'id')->where('project_id', $task->project_id),
-            ],
+            'tag_ids.*' => [Rule::exists('tags', 'id')->where('project_id', $task->project_id)],
         ]);
 
         $task->update($data);
