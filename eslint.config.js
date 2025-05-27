@@ -1,10 +1,10 @@
 import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import prettier from 'eslint-config-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import typescript from 'typescript-eslint';
-import stylistic from '@stylistic/eslint-plugin';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -129,13 +129,16 @@ export default [
             '@typescript-eslint/require-await': 'off',
 
             // Things prettier doesn' cover
-            'stylistic/lines-between-class-members': ['warn', {
-                enforce: [
-                    { prev: '*', next: 'method', blankLine: 'always' },
-                    { prev: 'method', next: '*', blankLine: 'always' },
-                    { prev: 'field', next: 'field', blankLine: 'never' },
-                ],
-            }],
+            'stylistic/lines-between-class-members': [
+                'warn',
+                {
+                    enforce: [
+                        { prev: '*', next: 'method', blankLine: 'always' },
+                        { prev: 'method', next: '*', blankLine: 'always' },
+                        { prev: 'field', next: 'field', blankLine: 'never' },
+                    ],
+                },
+            ],
         },
     },
 ];

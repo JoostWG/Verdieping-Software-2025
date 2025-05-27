@@ -1,2 +1,6 @@
 resources/js/ziggy.js
 resources/views/mail/*
+storage/*
+.github/*
+package-lock.json
+composer.lock
