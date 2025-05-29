@@ -19,10 +19,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useArrayState } from '@/hooks/use-array-state';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag, Task } from '@/types/backend';
-import { Head, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import axios, { AxiosError } from 'axios';
 import { Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
@@ -37,26 +36,13 @@ type TaskForm = {
 };
 
 export default function ProjectShow(props: { project: Project }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Projecten',
-            href: route('projects.index'),
-        },
-        {
-            title: props.project.name,
-            href: route('projects.show', [props.project]),
-        },
-    ];
-
     const [tasks, [addTask, updateTask, removeTask]] = useArrayState(
         props.project.tasks ?? [],
         (task) => task.id,
     );
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={props.project.name} />
-
+        <ProjectLayout project={props.project}>
             <div className="grid gap-4 p-4">
                 <h1 className="text-2xl">{props.project.name}</h1>
 
@@ -129,7 +115,7 @@ export default function ProjectShow(props: { project: Project }) {
                     }}
                 />
             </div>
-        </AppLayout>
+        </ProjectLayout>
     );
 }
 

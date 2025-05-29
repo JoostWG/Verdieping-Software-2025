@@ -69,6 +69,15 @@ class ProjectController extends Controller
         return Inertia::render('projects/show', compact('project'));
     }
 
+    public function tags(Project $project)
+    {
+        Gate::authorize('view', [$project]);
+
+        $project->load('tags');
+
+        return Inertia::render('projects/tags', compact('project'));
+    }
+
     /**
      * Update the specified resource in storage.
      */

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,6 +20,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'update',
         'destroy',
     ]);
+
+    Route::apiResource('tags', TagController::class)->only(['update']);
+
+    Route::get('/projects/{project}/tags', [
+        ProjectController::class,
+        'tags',
+    ])->name('projects.tags');
 });
 
 require __DIR__ . '/settings.php';
