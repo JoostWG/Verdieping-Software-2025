@@ -2,12 +2,15 @@ import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import type { Project } from '@/types/backend';
 import { Head, Link } from '@inertiajs/react';
+import type { LucideIcon } from 'lucide-react';
+import { BookmarkCheck, Tag } from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppLayout from './app-layout';
 
 interface Tab {
     label: string;
     route: string;
+    icon: LucideIcon;
 }
 
 export default function ProjectLayout({
@@ -22,10 +25,12 @@ export default function ProjectLayout({
         {
             label: 'Taken',
             route: 'projects.show',
+            icon: BookmarkCheck,
         },
         {
             label: 'Tags',
             route: 'projects.tags',
+            icon: Tag,
         },
     ];
 
@@ -50,12 +55,14 @@ export default function ProjectLayout({
                         key={tab.label}
                         href={route(tab.route, [project])}
                         className={cn(
+                            'flex items-center gap-1',
                             'bg-secondary rounded-md p-2',
                             route().current(tab.route)
                                 ? 'bg-primary text-primary-foreground'
                                 : 'hover:opacity-75',
                         )}
                     >
+                        <tab.icon size={16} />
                         {tab.label}
                     </Link>
                 ))}
