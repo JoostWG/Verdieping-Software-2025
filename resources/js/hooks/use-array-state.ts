@@ -1,20 +1,24 @@
 import { useState } from 'react';
 
+export type ArrayStateModifiers<T> = [
+    add: (item: T) => void,
+    update: (item: T, fields: Partial<T>) => void,
+    remove: (item: T) => void,
+];
+
+export type ArrayState<T> = [
+    state: T[],
+    modifiers: ArrayStateModifiers<T>,
+    setState: React.Dispatch<React.SetStateAction<T[]>>,
+];
+
 export function useArrayState<T extends object>(
     items: T[],
     key: (item: T) => string | number,
     options?: {
         addToBeginningOfArray: boolean;
     },
-): [
-    state: T[],
-    modifiers: [
-        add: (item: T) => void,
-        update: (item: T, fields: Partial<T>) => void,
-        remove: (item: T) => void,
-    ],
-    setState: React.Dispatch<React.SetStateAction<T[]>>,
-] {
+): ArrayState<T> {
     const [state, setState] = useState(items);
 
     return [
