@@ -1,3 +1,4 @@
+import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import InputError from '@/components/input-error';
 import { TagBadge } from '@/components/tag-badge';
 import { Button } from '@/components/ui/button';
@@ -22,9 +23,8 @@ import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag, Task } from '@/types/backend';
 import { useForm } from '@inertiajs/react';
-import { DialogDescription } from '@radix-ui/react-dialog';
 import axios, { AxiosError } from 'axios';
-import { Pencil, Plus, Trash2, TriangleAlert } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -333,27 +333,13 @@ function TaskDeleteConfirmationDialog(props: {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
-
-            <DialogContent>
-                <DialogTitle className="flex items-center gap-1">
-                    <TriangleAlert className="text-yellow-500" />
-                    Verwijder taak #{props.task.nr}
-                </DialogTitle>
-                <DialogDescription>
-                    Weet je zeker dat je deze taak wilt verwijderen?
-                </DialogDescription>
-                <DialogFooter className="gap-2">
-                    <DialogClose asChild>
-                        <Button variant="secondary">Annuleren</Button>
-                    </DialogClose>
-
-                    <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
-                        <button type="submit">Verwijderen</button>
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+            trigger={props.trigger}
+            openState={[open, setOpen]}
+            title={`Verwijder taak #${props.task.nr}`}
+            body="Weet je zeker dat je deze taak wilt verwijderen?"
+            buttonsDisabled={isProcessing}
+            onConfirm={submit}
+        />
     );
 }

@@ -1,3 +1,4 @@
+import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +20,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { Pencil, Trash2, TriangleAlert } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -218,27 +219,13 @@ function ProjectDeleteConfirmationDialog(props: {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
-
-            <DialogContent>
-                <DialogTitle className="flex items-center gap-1">
-                    <TriangleAlert className="text-yellow-500" />
-                    Verwijder project {props.project.name}
-                </DialogTitle>
-                <DialogDescription>
-                    Weet je zeker dat je dit project wilt verwijderen?
-                </DialogDescription>
-                <DialogFooter className="gap-2">
-                    <DialogClose asChild>
-                        <Button variant="secondary">Annuleren</Button>
-                    </DialogClose>
-
-                    <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
-                        <button type="submit">Verwijderen</button>
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+            trigger={props.trigger}
+            openState={[open, setOpen]}
+            title={`Verwijder project ${props.project.name}`}
+            body="Weet je zeker dat je dit project wilt verwijderen?"
+            buttonsDisabled={isProcessing}
+            onConfirm={submit}
+        />
     );
 }

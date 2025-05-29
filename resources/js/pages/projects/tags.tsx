@@ -1,21 +1,13 @@
+import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag } from '@/types/backend';
 import { useForm } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
-import { LoaderCircle, Pencil, Plus, Save, Trash2, TriangleAlert } from 'lucide-react';
+import { LoaderCircle, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useReducer, useState } from 'react';
 
@@ -250,27 +242,13 @@ function TagDeleteConfirmationDialog(props: {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
-
-            <DialogContent>
-                <DialogTitle className="flex items-center gap-1">
-                    <TriangleAlert className="text-yellow-500" />
-                    Verwijder tag {props.tag.name}
-                </DialogTitle>
-                <DialogDescription>
-                    Weet je zeker dat je deze taak wilt verwijderen?
-                </DialogDescription>
-                <DialogFooter className="gap-2">
-                    <DialogClose asChild>
-                        <Button variant="secondary">Annuleren</Button>
-                    </DialogClose>
-
-                    <Button variant="destructive" asChild disabled={isProcessing} onClick={submit}>
-                        <button type="submit">Verwijderen</button>
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+            trigger={props.trigger}
+            openState={[open, setOpen]}
+            title={`Verwijder tag ${props.tag.name}`}
+            body="Weet je zeker dat je deze tag wilt verwijderen?"
+            buttonsDisabled={isProcessing}
+            onConfirm={submit}
+        />
     );
 }
