@@ -9,15 +9,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
@@ -152,6 +151,8 @@ function TaskDialog(props: {
 
     const [open, setOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [tagSearchQuery, setTagSearchQuery] = useState('');
+    const projectTags = props.project.tags ?? [];
 
     useEffect(() => {
         if (open) {
@@ -198,6 +199,7 @@ function TaskDialog(props: {
             <DialogTrigger asChild>{props.trigger}</DialogTrigger>
 
             <DialogContent>
+                {projectTags.map((tag) => tag.name).join(', ')}
                 <DialogTitle>
                     {props.task ? `Wijzig taak #${props.task.nr}` : 'Maak een nieuwe taak aan'}
                 </DialogTitle>
@@ -235,55 +237,76 @@ function TaskDialog(props: {
 
                         <Label className="mt-1">Tags</Label>
 
-                        {props.project.tags && (
-                            <>
-                                <div className="mt-1 flex flex-wrap gap-1 rounded-md border p-2">
-                                    {form.data.tag_ids
-                                        .map((id) =>
-                                            props.project.tags?.find((tag) => tag.id === id),
+                        <div className="mt-1 flex items-center justify-between rounded-md border p-2">
+                            <div className="flex flex-wrap gap-1">
+                                {form.data.tag_ids
+                                    .map((id) => projectTags?.find((tag) => tag.id === id))
+                                    .filter((tag): tag is Tag => Boolean(tag))
+                                    .map((tag) => (
+                                        <TagBadge
+                                            key={tag.id}
+                                            tag={tag}
+                                            onDeleteClick={() => {
+                                                form.setData(
+                                                    'tag_ids',
+                                                    form.data.tag_ids.filter((id) => id !== tag.id),
+                                                );
+                                            }}
+                                        />
+                                    ))}
+                            </div>
+                            <DropdownMenu
+                                onOpenChange={(isOpen) => {
+                                    if (isOpen) {
+                                        setTagSearchQuery('');
+                                    }
+                                }}
+                            >
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="rounded-md">
+                                        <Plus strokeWidth={3} />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        placeholder="Zoeken..."
+                                        value={tagSearchQuery}
+                                        onKeyDown={(event) => {
+                                            // Prevent keyDown behavior from dropdown
+                                            event.stopPropagation();
+                                        }}
+                                        onChange={(event) => {
+                                            setTagSearchQuery(event.target.value);
+                                        }}
+                                    />
+
+                                    {projectTags
+                                        .filter(
+                                            (tag) =>
+                                                !form.data.tag_ids.includes(tag.id) &&
+                                                tag.name
+                                                    .toLowerCase()
+                                                    .includes(tagSearchQuery.toLowerCase()),
                                         )
-                                        .filter((tag): tag is Tag => Boolean(tag))
                                         .map((tag) => (
-                                            <TagBadge
+                                            <DropdownMenuItem
                                                 key={tag.id}
-                                                tag={tag}
-                                                onDeleteClick={() => {
-                                                    form.setData(
-                                                        'tag_ids',
-                                                        form.data.tag_ids.filter(
-                                                            (id) => id !== tag.id,
-                                                        ),
-                                                    );
+                                                onClick={() => {
+                                                    form.setData('tag_ids', [
+                                                        ...form.data.tag_ids,
+                                                        tag.id,
+                                                    ]);
                                                 }}
-                                            />
+                                                className="cursor-pointer"
+                                            >
+                                                {tag.name}
+                                            </DropdownMenuItem>
                                         ))}
-                                </div>
-
-                                <Select
-                                    value=""
-                                    onValueChange={(value) => {
-                                        form.setData('tag_ids', [
-                                            ...form.data.tag_ids,
-                                            Number(value),
-                                        ]);
-                                    }}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Voeg een tag toe" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        {props.project.tags
-                                            .filter((tag) => !form.data.tag_ids.includes(tag.id))
-                                            .map((tag) => (
-                                                <SelectItem key={tag.id} value={String(tag.id)}>
-                                                    {tag.name}
-                                                </SelectItem>
-                                            ))}
-                                    </SelectContent>
-                                </Select>
-                            </>
-                        )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
 
                     <DialogFooter className="gap-2">
