@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
 class TagController extends Controller
@@ -34,5 +35,17 @@ class TagController extends Controller
         $tag->update($data);
 
         return $tag;
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Tag $tag)
+    {
+        Gate::authorize('delete', [$tag]);
+
+        $tag->delete();
+
+        return Response::noContent();
     }
 }

@@ -14,4 +14,12 @@ class TagPolicy
     {
         return $user->can('update', $tag->project);
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Tag $tag): bool
+    {
+        return $user->can('delete', $tag->project);
+    }
 }

@@ -21,7 +21,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'destroy',
     ]);
 
-    Route::apiResource('tags', TagController::class)->only(['update']);
+    Route::apiResource('tags', TagController::class)->only([
+        'update',
+        'destroy',
+    ]);
 
     Route::get('/projects/{project}/tags', [
         ProjectController::class,
