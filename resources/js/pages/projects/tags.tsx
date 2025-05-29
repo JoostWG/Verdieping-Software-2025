@@ -82,7 +82,7 @@ export default function ProjectTasks(props: { project: Project }) {
                         <div key={tag.id} className="flex min-h-10 items-center">
                             {tag.id === editingTag?.id ? (
                                 <div>
-                                    <form className="flex justify-end gap-2" onSubmit={submitEdit}>
+                                    <form className="flex gap-2" onSubmit={submitEdit}>
                                         <div>
                                             <Input
                                                 autoFocus
