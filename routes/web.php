@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 
     Route::apiResource('tags', TagController::class)->only([
+        'store',
         'update',
         'destroy',
     ]);

@@ -15,9 +15,11 @@ import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag } from '@/types/backend';
 import { useForm } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
-import { LoaderCircle, Pencil, Save, Trash2, TriangleAlert } from 'lucide-react';
+import { LoaderCircle, Pencil, Plus, Save, Trash2, TriangleAlert } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useReducer, useState } from 'react';
+
+type NewTagForm = Pick<Tag, 'project_id' | 'name'>;
 
 export default function ProjectTasks(props: { project: Project }) {
     const [tags, [addTag, updateTag, removeTag]] = useArrayState<Tag>(
@@ -28,6 +30,9 @@ export default function ProjectTasks(props: { project: Project }) {
         })) ?? [],
         (tag) => tag.id,
     );
+
+    const newTagForm = useForm<NewTagForm>({ project_id: props.project.id, name: '' });
+    const [newTagFormIsProcessing, setNewTagFormIsProcessing] = useState(false);
 
     const editForm = useForm<{ name: string }>({ name: '' });
 
@@ -48,6 +53,39 @@ export default function ProjectTasks(props: { project: Project }) {
         editForm.setData('name', editingTag ? editingTag.name : '');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editingTag]);
+
+    function newSubmit(event: FormEvent) {
+        event.preventDefault();
+
+        if (!newTagForm.data.name) {
+            return;
+        }
+
+        setNewTagFormIsProcessing(true);
+
+        axios
+            .post<Tag>(route('tags.store'), newTagForm.data)
+            .then(({ data }) => {
+                newTagForm.reset();
+                addTag(data);
+            })
+            .catch((error) => {
+                if (
+                    !(
+                        error instanceof AxiosError &&
+                        error.status === 422 &&
+                        error.response?.data?.message
+                    )
+                ) {
+                    throw error;
+                }
+
+                newTagForm.setError('name', error.response.data.message);
+            })
+            .finally(() => {
+                setNewTagFormIsProcessing(false);
+            });
+    }
 
     function submitEdit(event: FormEvent) {
         event.preventDefault();
@@ -86,72 +124,103 @@ export default function ProjectTasks(props: { project: Project }) {
     return (
         <ProjectLayout project={props.project}>
             <div className="grid grid-cols-12 p-4">
-                <div className="col-span-6 divide-y rounded-md border">
-                    {tags.map((tag) => (
-                        <div key={tag.id} className="min-h-10">
-                            {tag.id === editingTag?.id ? (
-                                <div>
-                                    <form className="flex gap-2" onSubmit={submitEdit}>
-                                        <div>
-                                            <Input
-                                                autoFocus
-                                                defaultValue={editForm.data.name}
-                                                onChange={(event) => {
-                                                    editForm.setData('name', event.target.value);
+                <div className="col-span-6 grid gap-2">
+                    <div className="divide-y rounded-md border">
+                        {tags.map((tag) => (
+                            <div key={tag.id} className="min-h-10">
+                                {tag.id === editingTag?.id ? (
+                                    <div>
+                                        <form className="flex gap-2" onSubmit={submitEdit}>
+                                            <div>
+                                                <Input
+                                                    autoFocus
+                                                    defaultValue={editForm.data.name}
+                                                    onChange={(event) => {
+                                                        editForm.setData(
+                                                            'name',
+                                                            event.target.value,
+                                                        );
+                                                    }}
+                                                    readOnly={editIsProcessing}
+                                                    className="border-0"
+                                                />
+                                            </div>
+                                            <div className="flex items-center">
+                                                <Button variant="ghost" disabled={editIsProcessing}>
+                                                    {editIsProcessing ? (
+                                                        <LoaderCircle className="animate-spin" />
+                                                    ) : (
+                                                        <Save />
+                                                    )}
+                                                    Opslaan
+                                                </Button>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    disabled={editIsProcessing}
+                                                    onClick={() => {
+                                                        setEditingTag(null);
+                                                    }}
+                                                >
+                                                    Annuleren
+                                                </Button>
+                                            </div>
+                                        </form>
+                                        <InputError
+                                            message={editForm.errors.name}
+                                            className="mt-1"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between p-2">
+                                        <div className="flex items-center gap-1">
+                                            {tag.name}
+                                            <Pencil
+                                                size={16}
+                                                className="cursor-pointer text-blue-500 hover:opacity-75"
+                                                onClick={() => {
+                                                    setEditingTag(tag);
                                                 }}
-                                                readOnly={editIsProcessing}
-                                                className="border-0"
                                             />
                                         </div>
-                                        <div className="flex items-center">
-                                            <Button variant="ghost" disabled={editIsProcessing}>
-                                                {editIsProcessing ? (
-                                                    <LoaderCircle className="animate-spin" />
-                                                ) : (
-                                                    <Save />
-                                                )}
-                                                Opslaan
-                                            </Button>
 
-                                            <Button
-                                                variant="ghost"
-                                                disabled={editIsProcessing}
-                                                onClick={() => {
-                                                    setEditingTag(null);
-                                                }}
-                                            >
-                                                Annuleren
-                                            </Button>
-                                        </div>
-                                    </form>
-                                    <InputError message={editForm.errors.name} className="mt-1" />
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-between p-2">
-                                    <div className="flex items-center gap-1">
-                                        {tag.name}
-                                        <Pencil
-                                            size={16}
-                                            className="cursor-pointer text-blue-500 hover:opacity-75"
-                                            onClick={() => {
-                                                setEditingTag(tag);
+                                        <TagDeleteConfirmationDialog
+                                            trigger={
+                                                <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                            }
+                                            tag={tag}
+                                            onDelete={() => {
+                                                removeTag(tag);
                                             }}
                                         />
                                     </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <form className="flex gap-2" onSubmit={newSubmit}>
+                        <Input
+                            autoFocus
+                            value={newTagForm.data.name}
+                            onChange={(event) => {
+                                newTagForm.setData('name', event.target.value);
+                            }}
+                            readOnly={newTagFormIsProcessing}
+                        />
 
-                                    <TagDeleteConfirmationDialog
-                                        trigger={
-                                            <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
-                                        }
-                                        tag={tag}
-                                        onDelete={() => {
-                                            removeTag(tag);
-                                        }}
-                                    />
-                                </div>
+                        <Button
+                            variant="default"
+                            disabled={newTagFormIsProcessing || !newTagForm.data.name}
+                        >
+                            {newTagFormIsProcessing ? (
+                                <LoaderCircle className="animate-spin" />
+                            ) : (
+                                <Plus />
                             )}
-                        </div>
-                    ))}
+                            Toevoegen
+                        </Button>
+                    </form>
+                    <InputError message={newTagForm.errors.name} className="mt-1" />
                 </div>
             </div>
         </ProjectLayout>

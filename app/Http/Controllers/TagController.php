@@ -11,6 +11,38 @@ use Illuminate\Validation\Rule;
 class TagController extends Controller
 {
     /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $data = $request->validate(
+            [
+                'project_id' => ['required', 'integer'],
+                'name' => [
+                    'required',
+                    'max:255',
+                    Rule::unique('tags', 'name')->where(
+                        'project_id',
+                        $request->input('project_id')
+                    ),
+                ],
+            ],
+            [
+                'unique' => 'Er bestaat al een tag met die naam.',
+            ]
+        );
+
+        $project = $request
+            ->user()
+            ->projects()
+            ->findOrFail($data['project_id']);
+
+        $tag = $project->tags()->create($data);
+
+        return $tag;
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Tag $tag)
