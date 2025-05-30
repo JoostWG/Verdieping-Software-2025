@@ -21,7 +21,7 @@ export function DeleteConfirmationDialog(props: {
 }) {
     return (
         <Dialog open={props.openState[0]} onOpenChange={props.openState[1]}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+            <DialogTrigger>{props.trigger}</DialogTrigger>
 
             <DialogContent>
                 <DialogTitle className="flex items-center gap-1">

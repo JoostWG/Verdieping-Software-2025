@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -23,6 +24,7 @@ import dayjs from 'dayjs';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
+<Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -77,7 +79,12 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                 <div className="flex gap-2">
                                     <ProjectDialog
                                         trigger={
-                                            <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                            <Tooltip delayDuration={750}>
+                                                <TooltipTrigger asChild>
+                                                    <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Project wijzigen</TooltipContent>
+                                            </Tooltip>
                                         }
                                         project={project}
                                         onChange={(projectData) => {
@@ -86,7 +93,12 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                     />
                                     <ProjectDeleteConfirmationDialog
                                         trigger={
-                                            <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                            <Tooltip delayDuration={750}>
+                                                <TooltipTrigger asChild>
+                                                    <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Project verwijdren</TooltipContent>
+                                            </Tooltip>
                                         }
                                         project={project}
                                         onDelete={() => {
@@ -155,7 +167,7 @@ function ProjectDialog(props: {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+            <DialogTrigger>{props.trigger}</DialogTrigger>
 
             <DialogContent>
                 <DialogTitle>

@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag, Task } from '@/types/backend';
@@ -78,7 +79,12 @@ export default function ProjectShow(props: { project: Project }) {
                                 <div className="me-4 flex items-center gap-2">
                                     <TaskDialog
                                         trigger={
-                                            <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                            <Tooltip delayDuration={750}>
+                                                <TooltipTrigger asChild>
+                                                    <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Taak wijzigen</TooltipContent>
+                                            </Tooltip>
                                         }
                                         project={props.project}
                                         task={task}
@@ -89,7 +95,12 @@ export default function ProjectShow(props: { project: Project }) {
 
                                     <TaskDeleteConfirmationDialog
                                         trigger={
-                                            <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                            <Tooltip delayDuration={750}>
+                                                <TooltipTrigger asChild>
+                                                    <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Taak verwijdren</TooltipContent>
+                                            </Tooltip>
                                         }
                                         task={task}
                                         onDelete={() => {
@@ -104,7 +115,7 @@ export default function ProjectShow(props: { project: Project }) {
 
                 <TaskDialog
                     trigger={
-                        <Button variant="default">
+                        <Button variant="default" className="w-full">
                             <Plus strokeWidth={3} />
                             Nieuwe taak
                         </Button>
@@ -182,7 +193,7 @@ function TaskDialog(props: {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+            <DialogTrigger>{props.trigger}</DialogTrigger>
 
             <DialogContent>
                 {projectTags.map((tag) => tag.name).join(', ')}
@@ -248,10 +259,19 @@ function TaskDialog(props: {
                                     }
                                 }}
                             >
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="rounded-md">
-                                        <Plus strokeWidth={3} />
-                                    </Button>
+                                <DropdownMenuTrigger>
+                                    <Tooltip delayDuration={750}>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="rounded-md"
+                                            >
+                                                <Plus strokeWidth={3} />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Tag toevoegen</TooltipContent>
+                                    </Tooltip>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <Input

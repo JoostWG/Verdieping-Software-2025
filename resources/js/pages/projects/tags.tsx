@@ -2,6 +2,7 @@ import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialo
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
 import type { Project, Tag } from '@/types/backend';
@@ -167,18 +168,29 @@ export default function ProjectTasks(props: { project: Project }) {
                                     <div className="flex items-center justify-between p-2">
                                         <div className="flex items-center gap-1">
                                             {tag.name}
-                                            <Pencil
-                                                size={16}
-                                                className="cursor-pointer text-blue-500 hover:opacity-75"
-                                                onClick={() => {
-                                                    setEditingTag(tag);
-                                                }}
-                                            />
+
+                                            <Tooltip delayDuration={750}>
+                                                <TooltipTrigger asChild>
+                                                    <Pencil
+                                                        size={16}
+                                                        className="cursor-pointer text-blue-500 hover:opacity-75"
+                                                        onClick={() => {
+                                                            setEditingTag(tag);
+                                                        }}
+                                                    />
+                                                </TooltipTrigger>
+                                                <TooltipContent>Tag wijzigen</TooltipContent>
+                                            </Tooltip>
                                         </div>
 
                                         <TagDeleteConfirmationDialog
                                             trigger={
-                                                <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                                <Tooltip delayDuration={750}>
+                                                    <TooltipTrigger asChild>
+                                                        <Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>Tag verwijdren</TooltipContent>
+                                                </Tooltip>
                                             }
                                             tag={tag}
                                             onDelete={() => {
