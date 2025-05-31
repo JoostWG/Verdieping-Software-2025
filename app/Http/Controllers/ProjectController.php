@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -64,9 +65,11 @@ class ProjectController extends Controller
     {
         Gate::authorize('view', [$project]);
 
-        $project->load('tags', 'tasks.tags');
+        $project->load(['tags', 'tasks' => ['tags', 'status']]);
 
-        return Inertia::render('projects/show', compact('project'));
+        $statuses = Status::all();
+
+        return Inertia::render('projects/show', compact('project', 'statuses'));
     }
 
     public function tags(Project $project)

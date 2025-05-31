@@ -17,6 +17,7 @@ class TaskController extends Controller
     {
         $data = $request->validate([
             'project_id' => ['required', 'integer'],
+            'status_id' => ['required', 'exists:statuses,id'],
             'title' => ['required', 'max:255'],
             'description' => ['required', 'max:4294967295'],
             'tag_ids' => ['nullable', 'array'],
@@ -36,7 +37,7 @@ class TaskController extends Controller
         $task = $project->tasks()->create($data);
         $task->tags()->sync($request->input('tag_ids', []));
 
-        $task->load('tags');
+        $task->load('tags', 'status');
 
         return $task;
     }
@@ -49,6 +50,7 @@ class TaskController extends Controller
         Gate::authorize('update', [$task]);
 
         $data = $request->validate([
+            'status_id' => ['required', 'exists:statuses,id'],
             'title' => ['required', 'max:255'],
             'description' => ['required', 'max:4294967295'],
             'tag_ids' => ['nullable', 'array'],
@@ -63,7 +65,7 @@ class TaskController extends Controller
         $task->update($data);
         $task->tags()->sync($request->input('tag_ids', []));
 
-        $task->load('tags');
+        $task->load('tags', 'status');
 
         return $task;
     }

@@ -1,5 +1,6 @@
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import InputError from '@/components/input-error';
+import { StatusBadge } from '@/components/status-badge';
 import { TagBadge } from '@/components/tag-badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,21 +23,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
-import type { Project, Tag, Task } from '@/types/backend';
+import type { Project, Status, Tag, Task } from '@/types/backend';
 import { useForm } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
 
 type TaskForm = {
     project_id?: Task['project_id'];
+    status_id: Task['status_id'];
     title: Task['title'];
     description: Task['description'];
     tag_ids: Tag['id'][];
 };
 
-export default function ProjectShow(props: { project: Project }) {
+export default function ProjectShow(props: { project: Project; statuses: Status[] }) {
     const [tasks, [addTask, updateTask, removeTask]] = useArrayState(
         props.project.tasks ?? [],
         (task) => task.id,
@@ -57,9 +59,10 @@ export default function ProjectShow(props: { project: Project }) {
                                 className="flex items-center justify-between gap-1 p-2"
                             >
                                 <div key={task.id}>
-                                    <div className="flex gap-1">
+                                    <div className="flex items-center gap-1">
                                         <div className="text-neutral-400">#{task.nr}</div>
                                         <div>{task.title}</div>
+                                        {task.status && <StatusBadge status={task.status} />}
                                     </div>
                                     <div className="text-sm text-neutral-500">
                                         {task.description}
@@ -75,7 +78,6 @@ export default function ProjectShow(props: { project: Project }) {
                                         </div>
                                     )}
                                 </div>
-
                                 <div className="me-4 flex items-center gap-2">
                                     <TaskDialog
                                         trigger={
@@ -87,6 +89,7 @@ export default function ProjectShow(props: { project: Project }) {
                                             </Tooltip>
                                         }
                                         project={props.project}
+                                        statuses={props.statuses}
                                         task={task}
                                         onChange={(taskData) => {
                                             updateTask(task, taskData);
@@ -121,6 +124,7 @@ export default function ProjectShow(props: { project: Project }) {
                         </Button>
                     }
                     project={props.project}
+                    statuses={props.statuses}
                     onChange={(taskData) => {
                         addTask(taskData);
                     }}
@@ -134,6 +138,7 @@ function TaskDialog(props: {
     trigger: JSX.Element;
     project: Project;
     task?: Task;
+    statuses: Status[];
     onChange: (taskData: Task) => void;
 }) {
     const form = useForm<TaskForm>(
@@ -141,9 +146,16 @@ function TaskDialog(props: {
             ? {
                   title: props.task.title,
                   description: props.task.description,
+                  status_id: props.task.status_id,
                   tag_ids: props.task.tags?.map((tag) => tag.id) ?? [],
               }
-            : { title: '', description: '', project_id: props.project.id, tag_ids: [] },
+            : {
+                  title: '',
+                  description: '',
+                  project_id: props.project.id,
+                  status_id: props.statuses[0].id,
+                  tag_ids: [],
+              },
     );
 
     const [open, setOpen] = useState(false);
@@ -230,6 +242,34 @@ function TaskDialog(props: {
                         />
 
                         <InputError message={form.errors.description} />
+
+                        <Label className="mt-1">Status</Label>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className="flex w-1/3 cursor-pointer items-center justify-between rounded-md border p-2">
+                                <StatusBadge
+                                    status={
+                                        props.statuses.find(
+                                            (status) => status.id === form.data.status_id,
+                                        ) as Status
+                                    }
+                                />
+                                <ChevronDown />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {props.statuses.map((status) => (
+                                    <DropdownMenuItem
+                                        key={status.id}
+                                        onClick={() => {
+                                            form.setData('status_id', status.id);
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        <StatusBadge status={status} />
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
                         <Label className="mt-1">Tags</Label>
 
