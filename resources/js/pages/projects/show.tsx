@@ -196,7 +196,6 @@ function TaskDialog(props: {
             <DialogTrigger>{props.trigger}</DialogTrigger>
 
             <DialogContent>
-                {projectTags.map((tag) => tag.name).join(', ')}
                 <DialogTitle>
                     {props.task ? `Wijzig taak #${props.task.nr}` : 'Maak een nieuwe taak aan'}
                 </DialogTitle>
