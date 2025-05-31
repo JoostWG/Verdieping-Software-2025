@@ -12,7 +12,13 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
-    protected $fillable = ['project_id', 'nr', 'title', 'description'];
+    protected $fillable = [
+        'project_id',
+        'status_id',
+        'nr',
+        'title',
+        'description',
+    ];
 
     protected static function booted(): void
     {
@@ -40,5 +46,15 @@ class Task extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    /**
+     * The project this task belongs to
+     *
+     * @return BelongsTo<Status, Task>
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class);
     }
 }
