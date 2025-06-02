@@ -3,6 +3,7 @@ import InputError from '@/components/input-error';
 import { StatusBadge } from '@/components/status-badge';
 import { TagBadge } from '@/components/tag-badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogClose,
@@ -23,10 +24,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useArrayState } from '@/hooks/use-array-state';
 import ProjectLayout from '@/layouts/project-layout';
+import { cn, filterMultiple } from '@/lib/utils';
 import type { Project, Status, Tag, Task } from '@/types/backend';
 import { useForm } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
-import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+    ArrowDownAZ,
+    ArrowUpAZ,
+    ArrowUpDown,
+    ChevronDown,
+    Pencil,
+    Plus,
+    Trash2,
+} from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -38,16 +48,135 @@ type TaskForm = {
     tag_ids: Tag['id'][];
 };
 
-export default function ProjectShow(props: { project: Project; statuses: Status[] }) {
+export default function ProjectShow(props: {
+    project: Project;
+    statuses: Status[];
+    statusIds: Status['id'][];
+    orderBy: string;
+    orderByDesc: boolean;
+    allowedOrderByFields: Record<string, string>;
+}) {
     const [tasks, [addTask, updateTask, removeTask]] = useArrayState(
         props.project.tasks ?? [],
         (task) => task.id,
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [statusIds, [addStatusId, _, removeStatusId], setStatusIds] = useArrayState(
+        props.statusIds ?? [],
+        (id) => id,
+    );
+
+    const [orderBy, setOrderBy] = useState<string | null>(props.orderBy);
+    const [orderByDesc, setOrderByDesc] = useState(props.orderByDesc);
+
     return (
         <ProjectLayout project={props.project}>
             <div className="grid gap-4 p-4">
-                <h1 className="text-2xl">{props.project.name}</h1>
+                <div className="flex justify-between">
+                    <h1 className="text-2xl">{props.project.name}</h1>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary">Sorteren en filteren</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" asChild>
+                            <div className="grid grid-cols-12 gap-4 p-2">
+                                <div className="col-span-6 grid gap-1">
+                                    <div className="text-muted-foreground text-sm">Sorteren</div>
+                                    <div className="grid gap-2">
+                                        {Object.entries(props.allowedOrderByFields).map(
+                                            ([key, label]) => (
+                                                <div
+                                                    key={key}
+                                                    className={cn(
+                                                        'flex items-center gap-2',
+                                                        'cursor-pointer select-none',
+                                                        'hover:opacity-75',
+                                                    )}
+                                                    onClick={() => {
+                                                        if (key === orderBy) {
+                                                            setOrderByDesc(!orderByDesc);
+                                                        } else {
+                                                            setOrderBy(key);
+                                                            setOrderByDesc(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    {key !== orderBy ? (
+                                                        <ArrowUpDown className="text-secondary" />
+                                                    ) : !orderByDesc ? (
+                                                        <ArrowDownAZ />
+                                                    ) : (
+                                                        <ArrowUpAZ />
+                                                    )}
+                                                    {label}
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="col-span-6 grid gap-1">
+                                    <div className="text-muted-foreground text-sm">Filteren</div>
+                                    <div className="grid gap-2">
+                                        {props.statuses.map((status) => (
+                                            <label
+                                                key={status.id}
+                                                className={cn(
+                                                    'flex items-center gap-2',
+                                                    'cursor-pointer select-none',
+                                                )}
+                                            >
+                                                <Checkbox
+                                                    checked={statusIds.includes(status.id)}
+                                                    onCheckedChange={(state) => {
+                                                        if (state === 'indeterminate') {
+                                                            return;
+                                                        }
+
+                                                        if (state) {
+                                                            addStatusId(status.id);
+                                                        } else {
+                                                            removeStatusId(status.id);
+                                                        }
+                                                    }}
+                                                />
+                                                <StatusBadge status={status} />
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="col-span-12 flex justify-end gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => {
+                                            setOrderBy('nr');
+                                            setOrderByDesc(false);
+                                            setStatusIds([]);
+                                        }}
+                                    >
+                                        Reset
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="default"
+                                        onClick={() => {
+                                            filterMultiple({
+                                                statusIds: statusIds.join(','),
+                                                orderBy: orderBy ?? '',
+                                                desc: String(orderByDesc),
+                                            });
+                                        }}
+                                    >
+                                        Toepassen
+                                    </Button>
+                                </div>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
                 {!tasks.length ? (
                     <div>Dit project heeft geen taken.</div>

@@ -61,15 +61,65 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
+    public function show(Request $request, Project $project)
     {
         Gate::authorize('view', [$project]);
 
-        $project->load(['tags', 'tasks' => ['tags', 'status']]);
+        $statusIds = array_map(
+            fn($id) => intval($id),
+            $request->filled('statusIds')
+                ? explode(',', $request->input('statusIds'))
+                : []
+        );
+
+        // dd($statusIds);
+
+        $allowedOrderByFields = [
+            'nr' => 'Nummer',
+            'title' => 'Title',
+            'status_id' => 'Status',
+        ];
+
+        $orderBy = $request->filled('orderBy')
+            ? $request->input('orderBy')
+            : 'nr';
+
+        $orderByDesc = $request->boolean('desc');
+
+        if (!in_array($orderBy, array_keys($allowedOrderByFields))) {
+            $orderBy = null;
+        }
+
+        $project->load([
+            'tags',
+            'tasks' => fn($query) => $query
+                ->with(['tags', 'status'])
+                ->when(
+                    count($statusIds),
+                    fn($query) => $query->whereIn('status_id', $statusIds)
+                )
+                ->when(
+                    $orderBy,
+                    fn($query) => $query->orderBy(
+                        $orderBy,
+                        $orderByDesc ? 'desc' : 'asc'
+                    )
+                ),
+        ]);
 
         $statuses = Status::all();
 
-        return Inertia::render('projects/show', compact('project', 'statuses'));
+        return Inertia::render(
+            'projects/show',
+            compact(
+                'project',
+                'statuses',
+                'statusIds',
+                'orderBy',
+                'orderByDesc',
+                'allowedOrderByFields'
+            )
+        );
     }
 
     public function tags(Project $project)

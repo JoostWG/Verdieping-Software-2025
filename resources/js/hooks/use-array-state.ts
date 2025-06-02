@@ -12,7 +12,7 @@ export type ArrayState<T> = [
     setState: React.Dispatch<React.SetStateAction<T[]>>,
 ];
 
-export function useArrayState<T extends object>(
+export function useArrayState<T>(
     items: T[],
     key: (item: T) => string | number,
     options?: {
