@@ -17,14 +17,13 @@ import { useArrayState } from '@/hooks/use-array-state';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { Project } from '@/types/backend';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Table } from '@radix-ui/themes';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { FormEvent, JSX } from 'react';
 import { useEffect, useState } from 'react';
-<Trash2 className="cursor-pointer text-red-500 hover:opacity-75" />;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -120,16 +119,15 @@ function ProjectDialog(props: {
     project?: Project;
     onChange: (projectData: Project) => void;
 }) {
-    const initialProjectName = props.project ? props.project.name : '';
     const [open, setOpen] = useState(false);
-    const [projectName, setProjectName] = useState(initialProjectName);
-    const [errorMessage, setErrorMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+
+    const form = useForm({ name: props.project?.name ?? '' });
 
     useEffect(() => {
         if (open) {
-            setProjectName(initialProjectName);
-            setErrorMessage('');
+            form.reset();
+            form.setError('name', '');
             setIsProcessing(false);
         }
     }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -140,8 +138,8 @@ function ProjectDialog(props: {
         setIsProcessing(true);
 
         (props.project
-            ? axios.put<Project>(route('projects.update', [props.project]), { name: projectName })
-            : axios.post<Project>(route('projects.store'), { name: projectName })
+            ? axios.put<Project>(route('projects.update', [props.project]), form.data)
+            : axios.post<Project>(route('projects.store'), form.data)
         )
             .then(({ data }) => {
                 props.onChange(data);
@@ -155,11 +153,11 @@ function ProjectDialog(props: {
                     error.status === 422 &&
                     error.response?.data?.message
                 ) {
-                    setErrorMessage(error.response.data.message);
+                    form.setError('name', error.response.data.message);
                     return;
                 }
 
-                setErrorMessage('Er is iets fout gegaan.');
+                form.setError('name', error.response.data.message);
 
                 throw error;
             });
@@ -183,14 +181,14 @@ function ProjectDialog(props: {
                         <Input
                             id="name"
                             name="name"
-                            value={projectName}
+                            value={form.data.name}
                             readOnly={isProcessing}
-                            onChange={(e) => {
-                                setProjectName(e.target.value);
+                            onChange={(event) => {
+                                form.setData('name', event.target.value);
                             }}
                         />
 
-                        <InputError message={errorMessage} />
+                        <InputError message={form.errors.name} />
                     </div>
 
                     <DialogFooter className="gap-2">
