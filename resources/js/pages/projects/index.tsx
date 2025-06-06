@@ -78,12 +78,16 @@ export default function ProjectIndex(props: { projects: Project[] }) {
                                 <div className="flex gap-2">
                                     <ProjectDialog
                                         trigger={
-                                            <Tooltip delayDuration={750}>
-                                                <TooltipTrigger asChild>
-                                                    <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>Project wijzigen</TooltipContent>
-                                            </Tooltip>
+                                            <button>
+                                                <Tooltip delayDuration={750}>
+                                                    <TooltipTrigger asChild>
+                                                        <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Project wijzigen
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </button>
                                         }
                                         project={project}
                                         onChange={(projectData) => {

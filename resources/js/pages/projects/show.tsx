@@ -210,12 +210,14 @@ export default function ProjectShow(props: {
                                 <div className="me-4 flex items-center gap-2">
                                     <TaskDialog
                                         trigger={
-                                            <Tooltip delayDuration={750}>
-                                                <TooltipTrigger asChild>
-                                                    <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>Taak wijzigen</TooltipContent>
-                                            </Tooltip>
+                                            <button>
+                                                <Tooltip delayDuration={750}>
+                                                    <TooltipTrigger asChild>
+                                                        <Pencil className="cursor-pointer text-blue-500 hover:opacity-75" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>Taak wijzigen</TooltipContent>
+                                                </Tooltip>
+                                            </button>
                                         }
                                         project={props.project}
                                         statuses={props.statuses}
@@ -427,7 +429,7 @@ function TaskDialog(props: {
                                     }
                                 }}
                             >
-                                <DropdownMenuTrigger>
+                                <DropdownMenuTrigger asChild>
                                     <Tooltip delayDuration={750}>
                                         <TooltipTrigger asChild>
                                             <Button
