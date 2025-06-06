@@ -165,7 +165,7 @@ function ProjectDialog(props: {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>{props.trigger}</DialogTrigger>
+            <DialogTrigger asChild>{props.trigger}</DialogTrigger>
 
             <DialogContent>
                 <DialogTitle>
